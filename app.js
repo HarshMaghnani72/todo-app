@@ -1,6 +1,8 @@
 import { addTodo, toggleTodo, deleteTodo } from './todo.js';
+import { getInitialTheme, toggleTheme } from './theme.js';
 
 const STORAGE_KEY = 'todo-app-todos';
+const THEME_STORAGE_KEY = 'todo-app-theme';
 
 // State
 let todos = loadTodos();
@@ -13,6 +15,7 @@ const todoList = document.getElementById('todo-list');
 const itemCount = document.getElementById('item-count');
 const clearCompletedBtn = document.getElementById('clear-completed');
 const filterBtns = document.querySelectorAll('.filter-btn');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
 
 // Load todos from localStorage
 function loadTodos() {
@@ -31,6 +34,28 @@ function saveTodos() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
   } catch (e) {
     console.error('Failed to save todos to localStorage', e);
+  }
+}
+
+// Theme initialization and management
+function initTheme() {
+  try {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = getInitialTheme(savedTheme, prefersDark);
+    applyTheme(theme);
+  } catch (e) {
+    console.error('Failed to initialize theme', e);
+  }
+}
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.classList.toggle('dark', isDark);
+  if (darkModeToggle) {
+    darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+    darkModeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    darkModeToggle.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
   }
 }
 
@@ -130,5 +155,19 @@ clearCompletedBtn.addEventListener('click', () => {
   render();
 });
 
-// Initial render
+if (darkModeToggle) {
+  darkModeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    const newTheme = toggleTheme(currentTheme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    } catch (e) {
+      console.error('Failed to save theme to localStorage', e);
+    }
+    applyTheme(newTheme);
+  });
+}
+
+// Initial render & theme setup
+initTheme();
 render();

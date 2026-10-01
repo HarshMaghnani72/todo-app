@@ -174,3 +174,110 @@ h1 {
   padding: 1.5rem 0;
   font-style: italic;
 }
+
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.app-header h1 {
+  margin-bottom: 0;
+}
+
+.dark-mode-toggle {
+  background: none;
+  border: 1px solid transparent;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.dark-mode-toggle:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-color: #ddd;
+}
+
+/* Dark mode styles */
+html.dark {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+html.dark body {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+html.dark .todo-container {
+  background: #1e1e1e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+html.dark h1 {
+  color: #ecf0f1;
+}
+
+html.dark #todo-input {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+html.dark #todo-input:focus {
+  border-color: #3498db;
+}
+
+html.dark .filter-btn {
+  color: #aaa;
+}
+
+html.dark .filter-btn:hover {
+  border-color: #444;
+}
+
+html.dark .filter-btn.active {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+html.dark .filters {
+  border-bottom-color: #333;
+}
+
+html.dark .todo-item {
+  border-bottom-color: #2c2c2c;
+}
+
+html.dark .todo-item.completed .todo-text {
+  color: #7f8c8d;
+}
+
+html.dark .delete-btn:hover {
+  background-color: #4a2c2c;
+}
+
+html.dark .todo-footer {
+  border-top-color: #333;
+  color: #aaa;
+}
+
+html.dark #clear-completed {
+  color: #aaa;
+}
+
+html.dark #clear-completed:hover {
+  color: #e74c3c;
+}
+
+html.dark .empty-message {
+  color: #7f8c8d;
+}
+
+html.dark .dark-mode-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: #444;
+}
