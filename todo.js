@@ -23,3 +23,10 @@ export function toggleTodo(todos, id) {
 export function deleteTodo(todos, id) {
   return todos.filter(todo => todo.id !== id);
 }
+
+export function getCompletedCount(todos) {
+  if (!Array.isArray(todos)) {
+    return 0;
+  }
+  return todos.filter(todo => todo.completed).length;
+}

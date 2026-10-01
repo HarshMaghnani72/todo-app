@@ -1,4 +1,4 @@
-import { addTodo, toggleTodo, deleteTodo } from './todo.js';
+import { addTodo, toggleTodo, deleteTodo, getCompletedCount } from './todo.js';
 import { getInitialTheme, toggleTheme } from './theme.js';
 
 const STORAGE_KEY = 'todo-app-todos';
@@ -105,9 +105,10 @@ function render() {
     });
   }
 
-  // Update item count (active items left)
+  // Update item count and completed count
   const activeCount = todos.filter(t => !t.completed).length;
-  itemCount.textContent = `${activeCount} item${activeCount === 1 ? '' : 's'} left`;
+  const completedCount = getCompletedCount(todos);
+  itemCount.textContent = `${activeCount} item${activeCount === 1 ? '' : 's'} left, ${completedCount} completed`;
 }
 
 // Event Listeners

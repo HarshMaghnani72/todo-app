@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert';
-import { addTodo, toggleTodo, deleteTodo } from './todo.js';
+import { addTodo, toggleTodo, deleteTodo, getCompletedCount } from './todo.js';
 
 test('addTodo should add a new todo to the list', () => {
   const initialTodos = [];
@@ -42,4 +42,16 @@ test('deleteTodo should remove the specified todo by id', () => {
   const remaining = deleteTodo(todos, '1');
   assert.strictEqual(remaining.length, 1);
   assert.strictEqual(remaining[0].id, '2');
+});
+
+test('getCompletedCount should return the correct number of completed todos', () => {
+  const todos = [
+    { id: '1', text: 'Task 1', completed: true },
+    { id: '2', text: 'Task 2', completed: false },
+    { id: '3', text: 'Task 3', completed: true }
+  ];
+
+  assert.strictEqual(getCompletedCount(todos), 2);
+  assert.strictEqual(getCompletedCount([]), 0);
+  assert.strictEqual(getCompletedCount(null), 0);
 });
