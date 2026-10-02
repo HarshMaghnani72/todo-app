@@ -1,0 +1,9 @@
+{
+  "name": "todo-app",
+  "version": "1.0.0",
+  "description": "A simple todo application with plain HTML, CSS, and JS",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

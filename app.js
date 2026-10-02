@@ -1,0 +1,174 @@
+import { addTodo, toggleTodo, deleteTodo, getCompletedCount } from './todo.js';
+import { getInitialTheme, toggleTheme } from './theme.js';
+
+const STORAGE_KEY = 'todo-app-todos';
+const THEME_STORAGE_KEY = 'todo-app-theme';
+
+// State
+let todos = loadTodos();
+let currentFilter = 'all';
+
+// DOM Elements
+const todoForm = document.getElementById('todo-form');
+const todoInput = document.getElementById('todo-input');
+const todoList = document.getElementById('todo-list');
+const itemCount = document.getElementById('item-count');
+const clearCompletedBtn = document.getElementById('clear-completed');
+const filterBtns = document.querySelectorAll('.filter-btn');
+const darkModeToggle = document.getElementById('dark-mode-toggle');
+
+// Load todos from localStorage
+function loadTodos() {
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    console.error('Failed to load todos from localStorage', e);
+    return [];
+  }
+}
+
+// Save todos to localStorage
+function saveTodos() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+  } catch (e) {
+    console.error('Failed to save todos to localStorage', e);
+  }
+}
+
+// Theme initialization and management
+function initTheme() {
+  try {
+    const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const theme = getInitialTheme(savedTheme, prefersDark);
+    applyTheme(theme);
+  } catch (e) {
+    console.error('Failed to initialize theme', e);
+  }
+}
+
+function applyTheme(theme) {
+  const isDark = theme === 'dark';
+  document.documentElement.classList.toggle('dark', isDark);
+  if (darkModeToggle) {
+    darkModeToggle.textContent = isDark ? '☀️' : '🌙';
+    darkModeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+    darkModeToggle.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+}
+
+// Render UI
+function render() {
+  // Filter todos
+  const filteredTodos = todos.filter(todo => {
+    if (currentFilter === 'active') return !todo.completed;
+    if (currentFilter === 'completed') return todo.completed;
+    return true;
+  });
+
+  // Clear list
+  todoList.innerHTML = '';
+
+  if (filteredTodos.length === 0) {
+    const li = document.createElement('li');
+    li.className = 'empty-message';
+    li.textContent = currentFilter === 'all' 
+      ? 'No todos yet. Add one above!' 
+      : `No ${currentFilter} todos.`;
+    todoList.appendChild(li);
+  } else {
+    filteredTodos.forEach(todo => {
+      const li = document.createElement('li');
+      li.className = `todo-item ${todo.completed ? 'completed' : ''}`;
+      li.dataset.id = todo.id;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.className = 'todo-checkbox';
+      checkbox.checked = todo.completed;
+
+      const span = document.createElement('span');
+      span.className = 'todo-text';
+      span.textContent = todo.text;
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'delete-btn';
+      deleteBtn.textContent = '×';
+      deleteBtn.title = 'Delete todo';
+
+      li.appendChild(checkbox);
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+      todoList.appendChild(li);
+    });
+  }
+
+  // Update item count and completed count
+  const activeCount = todos.filter(t => !t.completed).length;
+  const completedCount = getCompletedCount(todos);
+  itemCount.textContent = `${activeCount} item${activeCount === 1 ? '' : 's'} left, ${completedCount} completed`;
+}
+
+// Event Listeners
+todoForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = todoInput.value;
+  try {
+    todos = addTodo(todos, text);
+    saveTodos();
+    todoInput.value = '';
+    render();
+  } catch (err) {
+    alert(err.message);
+  }
+});
+
+todoList.addEventListener('click', (e) => {
+  const li = e.target.closest('.todo-item');
+  if (!li) return;
+  const id = li.dataset.id;
+
+  if (e.target.classList.contains('todo-checkbox')) {
+    todos = toggleTodo(todos, id);
+    saveTodos();
+    render();
+  } else if (e.target.classList.contains('delete-btn')) {
+    todos = deleteTodo(todos, id);
+    saveTodos();
+    render();
+  }
+});
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    render();
+  });
+});
+
+clearCompletedBtn.addEventListener('click', () => {
+  todos = todos.filter(todo => !todo.completed);
+  saveTodos();
+  render();
+});
+
+if (darkModeToggle) {
+  darkModeToggle.addEventListener('click', () => {
+    const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    const newTheme = toggleTheme(currentTheme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, newTheme);
+    } catch (e) {
+      console.error('Failed to save theme to localStorage', e);
+    }
+    applyTheme(newTheme);
+  });
+}
+
+// Initial render & theme setup
+initTheme();
+render();
